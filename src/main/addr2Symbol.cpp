@@ -14,7 +14,7 @@ intptr_t Addr2Symbol::getVariableAddress(const std::string &name) {
   try {
 #ifdef __APPLE__
     return variables.at("_" + name);
-#elif defined(__linux)
+#elif defined(__linux__)
     return variables.at(name);
 #endif
   } catch (const std::out_of_range &err) {
@@ -30,7 +30,7 @@ intptr_t Addr2Symbol::getFunctionAddress(const std::string &name) {
       return item.addr;
     }
   }
-#elif defined(__linux)
+#elif defined(__linux__)
   for (const auto &item : functions) {
     if (item.name == name) {
       return item.addr;

@@ -12,8 +12,7 @@
 #include "addr2Symbol.hpp"
 
 namespace addr2Symbol {
-inline static void load_symbols(std::vector<function_info> &functions,
-                                std::unordered_map<std::string, intptr_t> &variables) {
+inline static void load_symbols(Addr2Symbol *addr_2_symbol) {
   uint32_t images_count = _dyld_image_count();
   for (uint32_t image_index = 0; image_index < images_count; image_index++) {
     const auto image_name = std::make_shared<std::string>(_dyld_get_image_name(image_index));
@@ -61,14 +60,14 @@ inline static void load_symbols(std::vector<function_info> &functions,
               auto demangled_name = abi::__cxa_demangle(mangled_name.c_str(), nullptr, nullptr, &status);
               auto address = reinterpret_cast<intptr_t>(text_segment + entry.n_value);
               if (status == 0) {
-                functions.push_back(function_info{image_name, std::string(demangled_name), address});
+                addr_2_symbol->addFunction(image_name, std::string(demangled_name), address);
               } else {
-                functions.push_back(function_info{image_name, mangled_name, address});
+                addr_2_symbol->addFunction(image_name, mangled_name, address);
               }
               free(demangled_name);
             } else if (entry.n_sect >= data_segment_low_bound && entry.n_sect < data_segment_upper_bound) {
               auto address = reinterpret_cast<intptr_t>(data_segment + entry.n_value);
-              variables.insert({mangled_name, address});
+              addr_2_symbol->addVariable(mangled_name, address);
             }
           }
         }
