@@ -6,17 +6,19 @@
 namespace addr2Symbol {
 using std::cout, std::endl;
 TEST(ArgsParserTest, TestMethodParsing) {
+#ifdef __APPLE__
+  auto function_name = "_function_example";
+#elif defined(__linux__)
+  auto function_name = "function_example";
+#endif
   Addr2Symbol addr_2_symbol;
   auto var4_ptr = addr_2_symbol.getVariableAddress("var4");
   auto function_address = addr_2_symbol.getFunctionAddress("function_example");
-  auto inside_function_address =function_address + 1;
+  auto inside_function_address = function_address;
   int (*function_example)() = (int (*)()) addr_2_symbol.getFunctionAddress("function_example");
   EXPECT_EQ(-123456789, function_example());
-#ifdef __APPLE__
-  EXPECT_EQ("_function_example", *addr_2_symbol.getFunctionName(inside_function_address));
-#elif defined(__linux__)
-  EXPECT_EQ("function_example", *addr_2_symbol.getFunctionName(inside_function_address));
-#endif
+  EXPECT_EQ(function_name, *addr_2_symbol.getFunctionName(inside_function_address)); // corner case
+  EXPECT_EQ(function_name, *addr_2_symbol.getFunctionName(inside_function_address + 1)); // in between case
   EXPECT_EQ(123456789, *((int *) var4_ptr));
 }
 
