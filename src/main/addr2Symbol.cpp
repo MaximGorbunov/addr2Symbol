@@ -11,7 +11,7 @@ Addr2Symbol::Addr2Symbol() : functions(), variables() {
   for (size_t i = 1; i < functions.size() - 1; ++i) {
     if (functions[i].name.empty() && functions[i].addr == functions[i + 1].addr) {
     } else if (functions[i].name.empty() && functions[i].addr == functions[i - 1].addr) {
-      functions.erase(functions.begin() + i);
+      functions.erase(functions.begin() + static_cast<long>(i));
     }
   }
 }
@@ -31,6 +31,9 @@ intptr_t Addr2Symbol::getVariableAddress(const std::string &name) {
 intptr_t Addr2Symbol::getFunctionAddress(const std::string &name) {
 #ifdef __APPLE__
   auto fixed_name = "_" + name;
+  if (name == "") {
+    fixed_name = name;
+  }
   for (const auto &item : functions) {
     if (item.name == fixed_name) {
       return item.addr;
