@@ -45,6 +45,9 @@ std::string *Addr2Symbol::getFunctionName(intptr_t address) {
       functions.begin(),
       functions.end(),
       function_info{std::make_shared<std::string>(""), "", address});
+  if (bound == functions.end() || bound->name.empty() || bound->addr > address) { // end of lib code
+    return nullptr;
+  }
   auto index = std::distance(functions.begin(), bound);
   return &functions[index - 1].name;
 }

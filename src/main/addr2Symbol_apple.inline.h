@@ -22,6 +22,7 @@ inline static void load_symbols(Addr2Symbol *addr_2_symbol) {
     auto *command_ptr = (load_command *) (header + 1);
     char *link_edit_segment;
     char *text_segment;
+    intptr_t text_segment_end;
     char *data_segment;
     uint64_t sects_counter = 1;
     uint64_t text_segment_low_bound = 0;
@@ -39,6 +40,7 @@ inline static void load_symbols(Addr2Symbol *addr_2_symbol) {
           text_segment_low_bound = sects_counter;
           sects_counter += command->nsects;
           text_segment_upper_bound = sects_counter;
+          text_segment_end = static_cast<intptr_t>(command->vmaddr + slide - command->fileoff + command->vmsize);
         }
         if (strcmp(SEG_DATA, command->segname) == 0) {
           data_segment = (char *) (command->vmaddr + slide - command->fileoff);
@@ -71,6 +73,7 @@ inline static void load_symbols(Addr2Symbol *addr_2_symbol) {
             }
           }
         }
+        addr_2_symbol->addFunction(image_name, std::string(""), text_segment_end);
       }
       command_ptr = (load_command *) ((char *) command_ptr + command_ptr->cmdsize);
     }

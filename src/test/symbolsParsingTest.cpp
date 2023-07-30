@@ -19,4 +19,22 @@ TEST(ArgsParserTest, TestMethodParsing) {
 #endif
   EXPECT_EQ(123456789, *((int *) var4_ptr));
 }
+
+TEST(ArgsParserTest, TestMethodParsingBelowCodeCase) {
+  Addr2Symbol addr_2_symbol;
+  auto func_name = addr_2_symbol.getFunctionName(0);
+  EXPECT_EQ(nullptr, func_name);
+}
+
+TEST(ArgsParserTest, TestMethodParsingAboveCodeCase) {
+  Addr2Symbol addr_2_symbol;
+  auto func_name = addr_2_symbol.getFunctionName(9223372036854775807);
+  EXPECT_EQ(nullptr, func_name);
+}
+
+TEST(ArgsParserTest, TestMethodParsingInBetweenLibrariesCase) {
+  Addr2Symbol addr_2_symbol;
+  auto func_addr = addr_2_symbol.getFunctionAddress("") + 1;
+  EXPECT_EQ(nullptr, addr_2_symbol.getFunctionName(func_addr));
+}
 }  // addr2Symbol
