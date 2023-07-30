@@ -8,6 +8,12 @@ namespace addr2Symbol {
 Addr2Symbol::Addr2Symbol() : functions(), variables() {
   load_symbols(this);
   std::sort(functions.begin(), functions.end());
+  for (size_t i = 1; i < functions.size() - 1; ++i) {
+    if (functions[i].name.empty() && functions[i].addr == functions[i + 1].addr) {
+    } else if (functions[i].name.empty() && functions[i].addr == functions[i - 1].addr) {
+      functions.erase(functions.begin() + i);
+    }
+  }
 }
 
 intptr_t Addr2Symbol::getVariableAddress(const std::string &name) {

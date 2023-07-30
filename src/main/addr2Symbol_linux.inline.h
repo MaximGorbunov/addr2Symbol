@@ -60,17 +60,33 @@ static int libCallback(struct dl_phdr_info *info, size_t size, void *addr_2_symb
             fseek(fd, (long) headers.get()[index].sh_offset, SEEK_SET);
             fread(symtab.get(), 1, headers.get()[index].sh_size, fd);
           }
+          if (headers.get()[index].sh_type == SHT_SYMTAB) {
+            symtab.reset((Elf64_Sym *) malloc(headers.get()[index].sh_size));
+            symbolsCount = headers.get()[index].sh_size / headers.get()[index].sh_entsize;
+            fseek(fd, (long) headers.get()[index].sh_offset, SEEK_SET);
+            fread(symtab.get(), 1, headers.get()[index].sh_size, fd);
+          }
         }
+        intptr_t text_end = 0;
         for (size_t symIndex = 0; symIndex < symbolsCount; symIndex++) {
           char *symName = &strtab.get()[symtab.get()[symIndex].st_name];
           if (ELF64_ST_TYPE(symtab.get()[symIndex].st_info) == STT_FUNC) {
             addr_2_symbol->addFunction(std::make_shared<std::string>(info->dlpi_name),
                                        std::string(symName),
                                        (intptr_t) (symtab.get()[symIndex].st_value + baseAddress));
+            auto symbol_end = (intptr_t) (symtab.get()[symIndex].st_value + baseAddress + symtab.get()[symIndex].st_size);
+            if (symbol_end > text_end) {
+              text_end = symbol_end;
+            }
           } else if (ELF64_ST_TYPE(symtab.get()[symIndex].st_info) == STT_OBJECT) {
             addr_2_symbol->addVariable(std::string(symName),
                                        (intptr_t) (symtab.get()[symIndex].st_value + baseAddress));
           }
+        }
+        if (text_end > 0) {
+          addr_2_symbol->addFunction(std::make_shared<std::string>(info->dlpi_name),
+                                     std::string(""),
+                                     text_end);
         }
         fclose(fd);
       }

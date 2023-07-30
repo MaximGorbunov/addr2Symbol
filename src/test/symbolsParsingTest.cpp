@@ -16,27 +16,28 @@ TEST(ArgsParserTest, TestMethodParsing) {
   auto function_address = addr_2_symbol.getFunctionAddress("function_example");
   auto inside_function_address = function_address;
   int (*function_example)() = (int (*)()) addr_2_symbol.getFunctionAddress("function_example");
-  EXPECT_EQ(-123456789, function_example());
-  EXPECT_EQ(function_name, *addr_2_symbol.getFunctionName(inside_function_address)); // corner case
-  EXPECT_EQ(function_name, *addr_2_symbol.getFunctionName(inside_function_address + 1)); // in between case
-  EXPECT_EQ(123456789, *((int *) var4_ptr));
+  EXPECT_EQ(function_example(), -123456789);
+  EXPECT_EQ(*addr_2_symbol.getFunctionName(inside_function_address), function_name); // corner case
+  EXPECT_EQ(*addr_2_symbol.getFunctionName(inside_function_address + 1), function_name); // in between case
+  EXPECT_EQ(*((int *) var4_ptr), 123456789);
 }
 
 TEST(ArgsParserTest, TestMethodParsingBelowCodeCase) {
   Addr2Symbol addr_2_symbol;
   auto func_name = addr_2_symbol.getFunctionName(0);
-  EXPECT_EQ(nullptr, func_name);
+  EXPECT_EQ(func_name, nullptr);
 }
 
 TEST(ArgsParserTest, TestMethodParsingAboveCodeCase) {
   Addr2Symbol addr_2_symbol;
   auto func_name = addr_2_symbol.getFunctionName(9223372036854775807);
-  EXPECT_EQ(nullptr, func_name);
+  EXPECT_EQ(func_name, nullptr);
 }
 
 TEST(ArgsParserTest, TestMethodParsingInBetweenLibrariesCase) {
   Addr2Symbol addr_2_symbol;
-  auto func_addr = addr_2_symbol.getFunctionAddress("") + 1;
-  EXPECT_EQ(nullptr, addr_2_symbol.getFunctionName(func_addr));
+  auto func_addr = addr_2_symbol.getFunctionAddress("");
+  EXPECT_GT(func_addr, 0);
+  EXPECT_EQ(addr_2_symbol.getFunctionName(func_addr), nullptr);
 }
 }  // addr2Symbol
