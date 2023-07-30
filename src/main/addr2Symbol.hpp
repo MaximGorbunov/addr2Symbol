@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <memory>
 
 namespace addr2Symbol {
 
@@ -23,6 +24,8 @@ class Addr2Symbol {
   intptr_t getVariableAddress(const std::string &name);
   intptr_t getFunctionAddress(const std::string &name);
   std::string* getFunctionName(intptr_t address);
+  void addFunction(const std::shared_ptr<std::string> &lib_name, const std::string &function_name, intptr_t address);
+  void addVariable(const std::string &function_name, intptr_t address);
  private:
   std::vector<function_info> functions;
   std::unordered_map<std::string, intptr_t> variables;

@@ -1,7 +1,7 @@
-#ifndef ADDR2SYMBOL_SRC_MAIN_ADDR2SYMBOL_APPLE_INLINE_H_
-#define ADDR2SYMBOL_SRC_MAIN_ADDR2SYMBOL_APPLE_INLINE_H_
-
 #ifdef __APPLE__
+#ifndef ADDR2SYMBOL_SRC_MAIN_ADDR2SYMBOL_APPLE_INLINE_H_
+
+#define ADDR2SYMBOL_SRC_MAIN_ADDR2SYMBOL_APPLE_INLINE_H_
 #include <mach-o/dyld.h>
 #include <mach-o/loader.h>
 #include <mach-o/nlist.h>
@@ -78,5 +78,5 @@ inline static void load_symbols(std::vector<function_info> &functions,
   }
 }
 } // addr2Symbol
-#endif
 #endif //ADDR2SYMBOL_SRC_MAIN_ADDR2SYMBOL_APPLE_INLINE_H_
+#endif //__APPLE__
