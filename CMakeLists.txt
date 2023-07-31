@@ -10,5 +10,5 @@ enable_testing()
 
 set(SRC_DIR ${PROJECT_SOURCE_DIR}/src/main/)
 
-add_subdirectory(src/main)
+add_subdirectory(src/main ./build)
 add_subdirectory(src/test)
