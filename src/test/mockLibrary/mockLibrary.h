@@ -4,6 +4,7 @@
 namespace addr2Symbol {
 extern "C" {
 extern int var4;
+extern int var_uninitialized;
 extern int function_example();
 }
 class MockLibrary {

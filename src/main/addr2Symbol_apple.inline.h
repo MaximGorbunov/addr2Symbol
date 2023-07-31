@@ -38,16 +38,15 @@ inline static void load_symbols(Addr2Symbol *addr_2_symbol) {
         if (strcmp(SEG_TEXT, command->segname) == 0) {
           text_segment = (char *) (command->vmaddr + slide - command->fileoff);
           text_segment_low_bound = sects_counter;
-          sects_counter += command->nsects;
-          text_segment_upper_bound = sects_counter;
+          text_segment_upper_bound = sects_counter + command->nsects;
           text_segment_end = static_cast<intptr_t>(command->vmaddr + slide - command->fileoff + command->vmsize);
         }
         if (strcmp(SEG_DATA, command->segname) == 0) {
           data_segment = (char *) (command->vmaddr + slide - command->fileoff);
           data_segment_low_bound = sects_counter;
-          sects_counter += command->nsects;
-          data_segment_upper_bound = sects_counter;
+          data_segment_upper_bound = sects_counter + command->nsects;
         }
+        sects_counter += command->nsects;
       }
       if (command_ptr->cmd == LC_SYMTAB) {
         auto *sym_tab_command = (symtab_command *) command_ptr;

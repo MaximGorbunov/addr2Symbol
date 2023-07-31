@@ -13,6 +13,7 @@ TEST(ArgsParserTest, TestMethodParsing) {
 #endif
   Addr2Symbol addr_2_symbol;
   auto var4_ptr = addr_2_symbol.getVariableAddress("var4");
+  auto var_uninitialized_ptr = addr_2_symbol.getVariableAddress("var_uninitialized");
   auto function_address = addr_2_symbol.getFunctionAddress("function_example");
   auto inside_function_address = function_address;
   int (*function_example)() = (int (*)()) addr_2_symbol.getFunctionAddress("function_example");
@@ -20,6 +21,7 @@ TEST(ArgsParserTest, TestMethodParsing) {
   EXPECT_EQ(*addr_2_symbol.getFunctionName(inside_function_address), function_name); // corner case
   EXPECT_EQ(*addr_2_symbol.getFunctionName(inside_function_address + 1), function_name); // in between case
   EXPECT_EQ(*((int *) var4_ptr), 123456789);
+  EXPECT_EQ(*((int *) var_uninitialized_ptr), -123456789);
 }
 
 TEST(ArgsParserTest, TestMethodParsingBelowCodeCase) {
