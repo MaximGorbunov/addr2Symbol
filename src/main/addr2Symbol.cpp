@@ -24,7 +24,7 @@ intptr_t Addr2Symbol::getVariableAddress(const std::string &name) {
     return variables.at(name);
 #endif
   } catch (const std::out_of_range &err) {
-    return -1;
+    return 0;
   }
 }
 
@@ -46,7 +46,7 @@ intptr_t Addr2Symbol::getFunctionAddress(const std::string &name) {
     }
   }
 #endif
-  return -1;
+  return 0;
 }
 
 std::string *Addr2Symbol::getFunctionName(intptr_t address) {
