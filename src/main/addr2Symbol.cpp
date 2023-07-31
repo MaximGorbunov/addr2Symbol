@@ -31,7 +31,7 @@ intptr_t Addr2Symbol::getVariableAddress(const std::string &name) {
 intptr_t Addr2Symbol::getFunctionAddress(const std::string &name) {
 #ifdef __APPLE__
   auto fixed_name = "_" + name;
-  if (name == "") {
+  if (name.empty()) {
     fixed_name = name;
   }
   for (const auto &item : functions) {
@@ -49,7 +49,7 @@ intptr_t Addr2Symbol::getFunctionAddress(const std::string &name) {
   return 0;
 }
 
-std::string *Addr2Symbol::getFunctionName(intptr_t address) {
+const function_info *Addr2Symbol::getFunctionInfo(intptr_t address) {
   auto bound = std::lower_bound(
       functions.begin(),
       functions.end(),
@@ -59,10 +59,10 @@ std::string *Addr2Symbol::getFunctionName(intptr_t address) {
   }
   if (bound->addr == address) { // corner case
     auto index = std::distance(functions.begin(), bound);
-    return &functions[index].name;
+    return &functions[index];
   } else {
     auto index = std::distance(functions.begin(), bound);
-    return &functions[index - 1].name;
+    return &functions[index - 1];
   }
 }
 
