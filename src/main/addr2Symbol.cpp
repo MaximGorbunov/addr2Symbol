@@ -1,7 +1,9 @@
 #include "addr2Symbol.hpp"
+
+#include <algorithm>
+
 #include "addr2Symbol_apple.inline.h"
 #include "addr2Symbol_linux.inline.h"
-#include <algorithm>
 
 namespace addr2Symbol {
 

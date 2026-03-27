@@ -21,9 +21,7 @@ inline static void load_symbols(Addr2Symbol *addr_2_symbol) {
     uint32_t load_command_count = header->ncmds;
     auto *command_ptr = (load_command *) (header + 1);
     char *link_edit_segment;
-    char *text_segment;
     intptr_t text_segment_end;
-    char *data_segment;
     uint64_t sects_counter = 1;
     uint64_t text_segment_low_bound = 0;
     uint64_t text_segment_upper_bound = 0;
@@ -36,13 +34,11 @@ inline static void load_symbols(Addr2Symbol *addr_2_symbol) {
           link_edit_segment = (char *) (command->vmaddr + slide - command->fileoff);
         }
         if (strcmp(SEG_TEXT, command->segname) == 0) {
-          text_segment = (char *) (command->vmaddr + slide - command->fileoff);
           text_segment_low_bound = sects_counter;
           text_segment_upper_bound = sects_counter + command->nsects;
-          text_segment_end = static_cast<intptr_t>(command->vmaddr + slide - command->fileoff + command->vmsize);
+          text_segment_end = static_cast<intptr_t>(command->vmaddr + slide + command->vmsize);
         }
         if (strcmp(SEG_DATA, command->segname) == 0) {
-          data_segment = (char *) (command->vmaddr + slide - command->fileoff);
           data_segment_low_bound = sects_counter;
           data_segment_upper_bound = sects_counter + command->nsects;
         }
@@ -59,7 +55,7 @@ inline static void load_symbols(Addr2Symbol *addr_2_symbol) {
             if (entry.n_sect >= text_segment_low_bound && entry.n_sect < text_segment_upper_bound) {
               int status;
               auto demangled_name = abi::__cxa_demangle(mangled_name.c_str(), nullptr, nullptr, &status);
-              auto address = reinterpret_cast<intptr_t>(text_segment + entry.n_value);
+              auto address = entry.n_value + slide;
               if (status == 0) {
                 addr_2_symbol->addFunction(image_name, std::string(demangled_name), address);
               } else {
@@ -67,7 +63,7 @@ inline static void load_symbols(Addr2Symbol *addr_2_symbol) {
               }
               free(demangled_name);
             } else if (entry.n_sect >= data_segment_low_bound && entry.n_sect < data_segment_upper_bound) {
-              auto address = reinterpret_cast<intptr_t>(data_segment + entry.n_value);
+              auto address = entry.n_value + slide;
               addr_2_symbol->addVariable(mangled_name, address);
             }
           }
