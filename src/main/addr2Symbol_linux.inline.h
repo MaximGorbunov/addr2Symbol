@@ -1,6 +1,6 @@
-#ifdef __linux
-#ifndef ADDR2SYMBOL_SRC_MAIN_ADDR2SYMBOL_APPLE_INLINE_H_
-#define ADDR2SYMBOL_SRC_MAIN_ADDR2SYMBOL_APPLE_INLINE_H_
+#ifdef __linux__
+#ifndef ADDR2SYMBOL_SRC_MAIN_ADDR2SYMBOL_LINUX_INLINE_H_
+#define ADDR2SYMBOL_SRC_MAIN_ADDR2SYMBOL_LINUX_INLINE_H_
 
 #include <memory>
 #include <string>
@@ -42,7 +42,7 @@ static int libCallback(struct dl_phdr_info *info, size_t size, void *addr_2_symb
         auto fd = fopen(info->dlpi_name, "r");
         if (fd == nullptr) return 0;
         fseek(fd, (long) header->e_shoff, SEEK_SET);
-        fread(headers.get(), sizeof(Elf64_Ehdr), header->e_shnum, fd);
+        fread(headers.get(), sizeof(Elf64_Shdr), header->e_shnum, fd);
         Elf64_Shdr &x = headers.get()[header->e_shstrndx];
         shstrtab.reset((char *) malloc(sizeof(char) * x.sh_size));
         fseek(fd, (long) x.sh_offset, SEEK_SET);
@@ -60,12 +60,10 @@ static int libCallback(struct dl_phdr_info *info, size_t size, void *addr_2_symb
             fseek(fd, (long) headers.get()[index].sh_offset, SEEK_SET);
             fread(symtab.get(), 1, headers.get()[index].sh_size, fd);
           }
-          if (headers.get()[index].sh_type == SHT_SYMTAB) {
-            symtab.reset((Elf64_Sym *) malloc(headers.get()[index].sh_size));
-            symbolsCount = headers.get()[index].sh_size / headers.get()[index].sh_entsize;
-            fseek(fd, (long) headers.get()[index].sh_offset, SEEK_SET);
-            fread(symtab.get(), 1, headers.get()[index].sh_size, fd);
-          }
+        }
+        if (strtab.get() == nullptr || symtab.get() == nullptr) {
+          fclose(fd);
+          return 0;
         }
         intptr_t text_end = 0;
         for (size_t symIndex = 0; symIndex < symbolsCount; symIndex++) {
@@ -99,5 +97,5 @@ inline static void load_symbols(addr2Symbol::Addr2Symbol *addr_2_symbol) {
   dl_iterate_phdr(libCallback, (void *) addr_2_symbol);
 }
 } // addr2Symbol
-#endif //ADDR2SYMBOL_SRC_MAIN_ADDR2SYMBOL_APPLE_INLINE_H_
-#endif //__linux
+#endif //ADDR2SYMBOL_SRC_MAIN_ADDR2SYMBOL_LINUX_INLINE_H_
+#endif //__linux__
