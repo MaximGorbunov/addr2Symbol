@@ -23,13 +23,6 @@ TEST(ArgsParserTest, TestMethodParsing) {
   EXPECT_EQ(addr_2_symbol.getFunctionInfo(inside_function_address + 1)->name, function_name); // in between case
   EXPECT_EQ(*((int *) var4_ptr), 123456789);
   EXPECT_EQ(*((int *) var_uninitialized_ptr), -123456789);
-  // dlsym
-  printf("lib(kevent) = %p\n", addr_2_symbol.getFunctionAddress("kevent"));
-  printf("lib2(kevent) = %s\n",addr_2_symbol.getFunctionInfo(6644641584)->name.c_str());
-
-  void *expected = dlsym(RTLD_DEFAULT, "kevent");
-  // Compare with what your addr_2_symbol resolves for the same address
-  printf("dlsym(kevent) = %p\n", expected);
 }
 
 TEST(ArgsParserTest, TestMethodParsingBelowCodeCase) {
